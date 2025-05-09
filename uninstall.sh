@@ -1,100 +1,72 @@
 #!/bin/bash
 
-if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root (use sudo)" 1>&2
-   exit 1
+echo
+echo "----------------------------"
+echo " Seeed Voicecard Uninstaller"
+echo "----------------------------"
+echo
+
+read -p "⚠️  Are you sure you want to remove the 2-Mic Voicecard driver and all audio configurations? [Y/N] " confirm
+if [[ "$confirm" != "Y" && "$confirm" != "y" ]]; then
+    echo "Uninstallation aborted."
+    exit 0
 fi
 
-is_Raspberry=$(cat /proc/device-tree/model | awk  '{print $1}')
-if [ "x${is_Raspberry}" != "xRaspberry" ] ; then
-  echo "Sorry, this drivers only works on raspberry pi"
-  exit 1
+# STEP 1: Remove kernel modules (manually installed)
+echo
+echo "🧹 Removing kernel modules..."
+KERNEL_DIR="/lib/modules/$(uname -r)/kernel/sound/soc"
+sudo rm -f "$KERNEL_DIR/codecs/snd-soc-wm8960.ko"
+sudo rm -f "$KERNEL_DIR/bcm/snd-soc-seeed-voicecard.ko"
+sudo depmod -a
+echo "✓ Kernel modules removed (if they existed)."
+
+# STEP 2: Remove Device Tree Overlay
+echo
+echo "🧹 Removing Device Tree Overlay..."
+sudo rm -f /boot/firmware/overlays/seeed-2mic-voicecard-overlay.dtbo
+echo "✓ Overlay file removed."
+
+# STEP 3: Clean dtoverlay from config.txt
+CONFIG_FILE="/boot/firmware/config.txt"
+echo "🧹 Cleaning overlay reference from $CONFIG_FILE..."
+sudo sed -i '/^dtoverlay=seeed-2mic-voicecard-overlay/d' "$CONFIG_FILE"
+echo "✓ config.txt cleaned."
+
+# STEP 4: Remove ALSA state file
+echo
+echo "🧹 Removing saved ALSA mixer configuration..."
+if [ -f /var/lib/alsa/asound.state ]; then
+    read -p "Do you want to remove /var/lib/alsa/asound.state? [Y/N] " remove_alsa
+    if [[ "$remove_alsa" =~ ^[Yy]$ ]]; then
+        sudo rm -f /var/lib/alsa/asound.state
+        echo "✓ ALSA state file removed."
+    else
+        echo "ℹ️ ALSA state file kept."
+    fi
+else
+    echo "No ALSA state file found. Skipping."
 fi
 
-uname_r=$(uname -r)
-
-CONFIG=/boot/config.txt
-[ -f /boot/firmware/config.txt ] && CONFIG=/boot/firmware/config.txt
-[ -f /boot/firmware/usercfg.txt ] && CONFIG=/boot/firmware/usercfg.txt
-
-get_overlay() {
-    ov=$1
-    if grep -q -E "^dtoverlay=$ov" $CONFIG; then
-      echo 0
+# STEP 5: Optionally remove PulseAudio default sink config
+PA_CONFIG=~/.config/pulse/default.pa
+if [ -f "$PA_CONFIG" ]; then
+    echo
+    read -p "Do you want to remove persistent PulseAudio sink config (~/.config/pulse/default.pa)? [Y/N] " remove_pa
+    if [[ "$remove_pa" =~ ^[Yy]$ ]]; then
+        rm -f "$PA_CONFIG"
+        echo "✓ PulseAudio sink config removed."
     else
-      echo 1
+        echo "ℹ️ PulseAudio sink config kept."
     fi
-}
+fi
 
-do_overlay() {
-    ov=$1
-    RET=$2
-    DEFAULT=--defaultno
-    CURRENT=0
-    if [ $(get_overlay $ov) -eq 0 ]; then
-        DEFAULT=
-        CURRENT=1
-    fi
-    if [ $RET -eq $CURRENT ]; then
-        ASK_TO_REBOOT=1
-    fi
-    if [ $RET -eq 0 ]; then
-        sed $CONFIG -i -e "s/^#dtoverlay=$ov/dtoverlay=$ov/"
-        if ! grep -q -E "^dtoverlay=$ov" $CONFIG; then
-            printf "dtoverlay=$ov\n" >> $CONFIG
-        fi
-        STATUS=enabled
-    elif [ $RET -eq 1 ]; then
-        sed $CONFIG -i -e "s/^dtoverlay=$ov/#dtoverlay=$ov/"
-        STATUS=disabled
-    else
-        return $RET
-    fi
-}
-
-RPI_HATS="seeed-2mic-voicecard seeed-4mic-voicecard seeed-8mic-voicecard"
-
-PATH=$PATH:/opt/vc/bin
-echo "remove dtbos"
-for i in $RPI_HATS; do
-    dtoverlay -r $i
-done
-OVERLAYS=/boot/overlays
-[ -d /boot/firmware/overlays ] && OVERLAYS=/boot/firmware/overlays
-
-rm  ${OVERLAYS}/seeed-2mic-voicecard.dtbo || true
-rm  ${OVERLAYS}/seeed-4mic-voicecard.dtbo || true
-rm  ${OVERLAYS}/seeed-8mic-voicecard.dtbo || true
-
-echo "remove alsa configs"
-rm -rf  /etc/voicecard/ || true
-
-echo "disabled seeed-voicecard.service "
-systemctl stop seeed-voicecard.service
-systemctl disable seeed-voicecard.service
-
-echo "remove seeed-voicecard"
-rm  /usr/bin/seeed-voicecard || true
-rm  /lib/systemd/system/seeed-voicecard.service || true
-
-echo "remove dkms"
-rm  -rf /var/lib/dkms/seeed-voicecard || true
-
-echo "remove kernel modules"
-rm  /lib/modules/*/kernel/sound/soc/codecs/snd-soc-wm8960.ko || true
-rm  /lib/modules/*/kernel/sound/soc/codecs/snd-soc-ac108.ko || true
-rm  /lib/modules/*/kernel/sound/soc/bcm/snd-soc-seeed-voicecard.ko || true
-rm  /lib/modules/*/updates/dkms/snd-soc-wm8960.ko || true
-rm  /lib/modules/*/updates/dkms/snd-soc-ac108.ko || true
-rm  /lib/modules/*/updates/dkms/snd-soc-seeed-voicecard.ko || true
-
-echo "remove $CONFIG configuration"
-for i in $RPI_HATS; do
-    echo Uninstall $i ...
-    do_overlay $i 1
-done
-
-echo "------------------------------------------------------"
-echo "Please reboot your raspberry pi to apply all settings"
-echo "Thank you!"
-echo "------------------------------------------------------"
+# STEP 6: Final message
+echo
+echo "✅ Uninstallation complete. A reboot is recommended."
+read -p "Would you like to reboot now? [Y/N] " reboot_now
+if [[ "$reboot_now" =~ ^[Yy]$ ]]; then
+    sudo reboot
+else
+    echo "You can reboot later manually."
+fi

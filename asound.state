@@ -1,43 +1,46 @@
-state.ALSA {
+state.vc4hdmi0 {
 	control.1 {
-		iface MIXER
-		name 'PCM Playback Volume'
-		value -1994
-		comment {
-			access 'read write'
-			type INTEGER
-			count 1
-			range '-10239 - 400'
-			dbmin -9999999
-			dbmax 400
-			dbvalue.0 -1994
-		}
-	}
-	control.2 {
-		iface MIXER
-		name 'PCM Playback Switch'
+		iface CARD
+		name 'HDMI Jack'
 		value true
 		comment {
-			access 'read write'
+			access read
 			type BOOLEAN
 			count 1
 		}
 	}
-	control.3 {
-		iface MIXER
-		name 'PCM Playback Route'
-		value 0
+	control.2 {
+		iface PCM
+		name 'Playback Channel Map'
+		value.0 0
+		value.1 0
+		value.2 0
+		value.3 0
+		value.4 0
+		value.5 0
+		value.6 0
+		value.7 0
 		comment {
-			access 'read write'
+			access 'read volatile'
 			type INTEGER
+			count 8
+			range '0 - 36'
+		}
+	}
+	control.3 {
+		iface PCM
+		name 'IEC958 Playback Mask'
+		value ffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+		comment {
+			access read
+			type IEC958
 			count 1
-			range '0 - 2'
 		}
 	}
 	control.4 {
 		iface PCM
 		name 'IEC958 Playback Default'
-		value '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+		value '0482000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 		comment {
 			access 'read write'
 			type IEC958
@@ -46,22 +49,72 @@ state.ALSA {
 	}
 	control.5 {
 		iface PCM
-		name 'IEC958 Playback Con Mask'
-		value '0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+		name ELD
+		value '100007006810000100000000000000002a5006704a5250373030364809070700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+		comment {
+			access 'read volatile'
+			type BYTES
+			count 128
+		}
+	}
+}
+state.vc4hdmi1 {
+	control.1 {
+		iface CARD
+		name 'HDMI Jack'
+		value false
+		comment {
+			access read
+			type BOOLEAN
+			count 1
+		}
+	}
+	control.2 {
+		iface PCM
+		name 'Playback Channel Map'
+		value.0 0
+		value.1 0
+		value.2 0
+		value.3 0
+		value.4 0
+		value.5 0
+		value.6 0
+		value.7 0
+		comment {
+			access 'read volatile'
+			type INTEGER
+			count 8
+			range '0 - 36'
+		}
+	}
+	control.3 {
+		iface PCM
+		name 'IEC958 Playback Mask'
+		value ffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 		comment {
 			access read
 			type IEC958
 			count 1
 		}
 	}
-	control.6 {
+	control.4 {
 		iface PCM
-		name 'IEC958 Playback PCM Stream'
-		value '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+		name 'IEC958 Playback Default'
+		value '0400000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 		comment {
-			access 'read write inactive'
+			access 'read write'
 			type IEC958
 			count 1
+		}
+	}
+	control.5 {
+		iface PCM
+		name ELD
+		value '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+		comment {
+			access 'read volatile'
+			type BYTES
+			count 128
 		}
 	}
 }
@@ -69,8 +122,8 @@ state.seeed2micvoicec {
 	control.1 {
 		iface MIXER
 		name 'Capture Volume'
-		value.0 39
-		value.1 39
+		value.0 63
+		value.1 63
 		comment {
 			access 'read write'
 			type INTEGER
@@ -78,20 +131,19 @@ state.seeed2micvoicec {
 			range '0 - 63'
 			dbmin -1725
 			dbmax 3000
-			dbvalue.0 1200
-			dbvalue.1 1200
+			dbvalue.0 3000
+			dbvalue.1 3000
 		}
 	}
 	control.2 {
 		iface MIXER
 		name 'Capture Volume ZC Switch'
-		value.0 0
-		value.1 0
+		value.0 true
+		value.1 true
 		comment {
 			access 'read write'
-			type INTEGER
+			type BOOLEAN
 			count 2
-			range '0 - 1'
 		}
 	}
 	control.3 {
@@ -164,7 +216,7 @@ state.seeed2micvoicec {
 	control.8 {
 		iface MIXER
 		name 'Right Input Boost Mixer RINPUT1 Volume'
-		value 3
+		value 2
 		comment {
 			access 'read write'
 			type INTEGER
@@ -172,13 +224,13 @@ state.seeed2micvoicec {
 			range '0 - 3'
 			dbmin 0
 			dbmax 2900
-			dbvalue.0 2900
+			dbvalue.0 2000
 		}
 	}
 	control.9 {
 		iface MIXER
 		name 'Left Input Boost Mixer LINPUT1 Volume'
-		value 3
+		value 2
 		comment {
 			access 'read write'
 			type INTEGER
@@ -186,7 +238,7 @@ state.seeed2micvoicec {
 			range '0 - 3'
 			dbmin 0
 			dbmax 2900
-			dbvalue.0 2900
+			dbvalue.0 2000
 		}
 	}
 	control.10 {
@@ -208,8 +260,8 @@ state.seeed2micvoicec {
 	control.11 {
 		iface MIXER
 		name 'Headphone Playback Volume'
-		value.0 127
-		value.1 127
+		value.0 109
+		value.1 109
 		comment {
 			access 'read write'
 			type INTEGER
@@ -217,15 +269,15 @@ state.seeed2micvoicec {
 			range '0 - 127'
 			dbmin -9999999
 			dbmax 600
-			dbvalue.0 600
-			dbvalue.1 600
+			dbvalue.0 -1200
+			dbvalue.1 -1200
 		}
 	}
 	control.12 {
 		iface MIXER
 		name 'Headphone Playback ZC Switch'
-		value.0 false
-		value.1 false
+		value.0 true
+		value.1 true
 		comment {
 			access 'read write'
 			type BOOLEAN
@@ -235,8 +287,8 @@ state.seeed2micvoicec {
 	control.13 {
 		iface MIXER
 		name 'Speaker Playback Volume'
-		value.0 127
-		value.1 127
+		value.0 109
+		value.1 109
 		comment {
 			access 'read write'
 			type INTEGER
@@ -244,15 +296,15 @@ state.seeed2micvoicec {
 			range '0 - 127'
 			dbmin -9999999
 			dbmax 600
-			dbvalue.0 600
-			dbvalue.1 600
+			dbvalue.0 -1200
+			dbvalue.1 -1200
 		}
 	}
 	control.14 {
 		iface MIXER
 		name 'Speaker Playback ZC Switch'
-		value.0 false
-		value.1 false
+		value.0 true
+		value.1 true
 		comment {
 			access 'read write'
 			type BOOLEAN
@@ -262,7 +314,7 @@ state.seeed2micvoicec {
 	control.15 {
 		iface MIXER
 		name 'Speaker DC Volume'
-		value 4
+		value 5
 		comment {
 			access 'read write'
 			type INTEGER
@@ -490,7 +542,7 @@ state.seeed2micvoicec {
 	control.35 {
 		iface MIXER
 		name 'Noise Gate Switch'
-		value false
+		value true
 		comment {
 			access 'read write'
 			type BOOLEAN
@@ -544,7 +596,7 @@ state.seeed2micvoicec {
 	control.39 {
 		iface MIXER
 		name 'Right Output Mixer Boost Bypass Volume'
-		value 5
+		value 0
 		comment {
 			access 'read write'
 			type INTEGER
@@ -552,13 +604,13 @@ state.seeed2micvoicec {
 			range '0 - 7'
 			dbmin -2100
 			dbmax 0
-			dbvalue.0 -600
+			dbvalue.0 -2100
 		}
 	}
 	control.40 {
 		iface MIXER
 		name 'Right Output Mixer RINPUT3 Volume'
-		value 2
+		value 0
 		comment {
 			access 'read write'
 			type INTEGER
@@ -566,7 +618,7 @@ state.seeed2micvoicec {
 			range '0 - 7'
 			dbmin -2100
 			dbmax 0
-			dbvalue.0 -1500
+			dbvalue.0 -2100
 		}
 	}
 	control.41 {
@@ -586,7 +638,7 @@ state.seeed2micvoicec {
 	control.42 {
 		iface MIXER
 		name 'DAC Mono Mix'
-		value Stereo
+		value Mono
 		comment {
 			access 'read write'
 			type ENUMERATED
@@ -738,7 +790,7 @@ state.seeed2micvoicec {
 	control.57 {
 		iface MIXER
 		name 'Mono Output Mixer Left Switch'
-		value false
+		value true
 		comment {
 			access 'read write'
 			type BOOLEAN
@@ -748,7 +800,7 @@ state.seeed2micvoicec {
 	control.58 {
 		iface MIXER
 		name 'Mono Output Mixer Right Switch'
-		value false
+		value true
 		comment {
 			access 'read write'
 			type BOOLEAN
