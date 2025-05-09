@@ -61,10 +61,6 @@ This project provides extended drivers for ReSpeaker 2-mic audio device, specifi
 
 - LEDs are currently non-functional
 
-## Troubleshooting
-
-If you encounter any issues, run config_audio.sh to restore the initial installation settings.
-
 ## Uninstallation
 
 Uninstallation can be performed using the uninstall.sh script. Please note that this feature has not been fully tested yet, so I cannot guarantee it is working perfectly — but in principle, it should function correctly.
