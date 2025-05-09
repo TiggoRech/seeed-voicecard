@@ -14,22 +14,19 @@
 ![SPI](https://img.shields.io/badge/SPI-Enabled-orange?style=for-the-badge)
 ![Kernel Module](https://img.shields.io/badge/Kernel-Module-lightgrey?style=for-the-badge)
 ![DKMS](https://img.shields.io/badge/DKMS-Supported-yellow?style=for-the-badge)
-![Pi 4](https://img.shields.io/badge/Raspberry%20Pi%204-Supported-success?style=for-the-badge)
 ![Pi 5](https://img.shields.io/badge/Raspberry%20Pi%205-Supported-success?style=for-the-badge)
-
-THE CODE HAS NOT BEEN UPDATED YET — FOR NOW, IT IS STILL WARTEM'S ORIGINAL VERSION, BASED ON KERNEL 6.6.
 
 ## Overview
 
-This project provides extended drivers for ReSpeaker audio devices, specifically targeting Raspberry Pi 5. It's a fork of Wartem's fork from the official ReSpeaker drivers, with the goal of adding support for newer Raspberry Pi 5 models and implementing diagnostics and tests.
+This project provides extended drivers for ReSpeaker 2-mic audio device, specifically targeting Raspberry Pi 5. It's a fork of Wartem's fork from the official ReSpeaker drivers, with the goal of adding support for newer Raspberry Pi 5 models.
 
 ## Current Status - Experimental
 
 - **Compatibility**: Optimized for Raspberry Pi 5 (May work on Pi 4 - Not tested)
 - **Testing**: Successfully tested basic I/O audio on Raspberry Pi 5 with ReSpeaker 2-Mics Pi HAT
 - **Environment**: 
-  - Debian GNU/Linux 12 (bookworm) - Latest version as of 2024-10-01
-  - Linux kernel: 6.6.51+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.6.51-1+rpt2 (2024-10-01) aarch64 GNU/Linux
+  - Debian GNU/Linux 12 (bookworm)
+  - Linux kernel: 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64 GNU/Linux
 - **Functionality**: Supports audio recording and playback using ALSA
 
 ### Supported Devices
@@ -38,7 +35,7 @@ This project provides extended drivers for ReSpeaker audio devices, specifically
 
 ## Features
 
-- Extended support for Raspberry Pi 5 (Not tested on Pi 4)
+- Extended support for Raspberry Pi 5 on kernel 6.12.25+rpt-rpi-2712.
 - Utilizes default ALSA drivers for audio functionality
 - Maintains compatibility with Seeed 2-mic voice card (ReSpeaker HAT)
 - Includes 2 scripts: config_audio.sh to restore default settings and unistall.sh.
@@ -55,13 +52,13 @@ This project provides extended drivers for ReSpeaker audio devices, specifically
    ```
 3. Run the install.sh script:
    ```bash
-   sudo bash expanded_menu.sh
+   sudo chmod +x install.sh post_install.sh config_audio.sh uninstall.sh
+   sudo bash install.sh
    ```
 4. Follow the on-screen instructions to install or uninstall.
 
 ## Known Issues
 
-- Clock configuration warning for WM8960 codec (does not affect basic functionality)
 - LEDs are currently non-functional
 
 ## Troubleshooting
