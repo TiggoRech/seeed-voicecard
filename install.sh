@@ -9,10 +9,24 @@ function abort_installation {
     exit 1
 }
 
-echo "Have you checked your kernel version (command: uname -r) to ensure your Raspberry Pi 5 is running '6.12.25+rpt-rpi-2712'? [Y/N]"
+current_kernel=$(uname -r)
+required_prefix="6.12"
+
+echo "Your current kernel version is: $current_kernel"
+echo "This installer is designed for kernel versions starting with '$required_prefix'."
+echo "Do you want to proceed with the installation? [Y/N]"
 read -r kernel_confirm
 if [[ "$kernel_confirm" != "Y" && "$kernel_confirm" != "y" ]]; then
     abort_installation
+fi
+
+if [[ "$current_kernel" != $required_prefix* ]]; then
+    echo "Warning: Your kernel version doesn't start with '$required_prefix'. Proceed at your own risk."
+    echo "Do you still want to continue? [Y/N]"
+    read -r proceed_anyway
+    if [[ "$proceed_anyway" != "Y" && "$proceed_anyway" != "y" ]]; then
+        abort_installation
+    fi
 fi
 
 echo
@@ -34,8 +48,8 @@ fi
 
 echo
 echo "[2/3] Installing compiled modules..."
-sudo cp snd-soc-wm8960.ko /lib/modules/$(uname -r)/kernel/sound/soc/codecs/
-sudo cp snd-soc-seeed-voicecard.ko /lib/modules/$(uname -r)/kernel/sound/soc/bcm/
+sudo cp snd-soc-wm8960.ko /lib/modules/"$current_kernel"/kernel/sound/soc/codecs/
+sudo cp snd-soc-seeed-voicecard.ko /lib/modules/"$current_kernel"/kernel/sound/soc/bcm/
 sudo depmod -a
 if [ $? -ne 0 ]; then
     echo "Module installation failed."
@@ -44,4 +58,4 @@ fi
 
 echo
 echo "[3/3] Running post-installation steps..."
-./post_install.sh
+bash "$(dirname "$0")/post_install.sh"
