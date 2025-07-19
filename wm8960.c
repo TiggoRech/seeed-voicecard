@@ -626,8 +626,9 @@ static int wm8960_configure_clocking(struct snd_soc_codec *codec)
 	}
 
 	if (wm8960->clk_id != WM8960_SYSCLK_MCLK && !wm8960->freq_in) {
-		dev_err(codec->dev, "No MCLK configured\n");
-		return -EINVAL;
+		dev_warn(codec->dev, "No MCLK configured, falling back to PLL\n");
+		wm8960->clk_id = WM8960_SYSCLK_PLL;
+		wm8960->freq_in = 24000000;  // ou outro valor base, se você usa um fixed-clock
 	}
 
 	freq_in = wm8960->freq_in;
